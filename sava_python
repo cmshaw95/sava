@@ -1,15 +1,23 @@
 import requests
 import json 
-from datetime import date
+import datetime
 
-today = date.today()
+today = datetime.datetime.now()
+#find out what the date was 7 days ago 
+d = datetime.timedelta(days = 7)
+dateSub = today - d
+#format date to work in API request
+weekAgo = dateSub.strftime("%Y-%m-%dT%H:%M:%S")
+
 
 #high level payment info 
 url = 'https://connect.squareup.com/v2/payments'
+urlDate = 'https://connect.squareup.com/v2/payments?begin_time='+weekAgo
+
 apiKey = "EAAAETiZWYursLwLLN-X1Y7PsDCMaG_dWmK1Ivk_B8enyhuv_XA3gKJUQZQL_l7h"
 header = {'Square-Version': '2020-05-28', 'Authorization': 'Bearer '+str(apiKey), 'Content-Type': 'application/json'}
 
-r = requests.get(url, headers=header)
+r = requests.get(urlDate, headers=header)
 content = r.content
 
 #parse json data
@@ -18,7 +26,7 @@ resp = json.loads(my_json)
 
 def square_shit():
 	print('\n')
-	print("Grabbing your orders from square in the last 7 days.....")
+	print("Grabbing your orders from square in the last 7 days.....") 
 	print('\n')
 	for x in resp["payments"]: 
 		ID = x["id"]
@@ -32,6 +40,8 @@ def square_shit():
 		print("Order ID: " +orderID)
 		print("Payment Date: " +created)
 		print("Currency: "+cur)
+		#square uses 100 for $1, 103 for $1.03, so multiple it by .01
+		print("Payment Revenue: " + "$"+str(amount*.01))
 		#totalRev+=amount
 		#totalNet+=net
 		try: 
@@ -40,8 +50,6 @@ def square_shit():
 				net = amount - fee 
 				#totalFees+=fee
 				
-				#square uses 100 for $1, 103 for $1.03, so multiple it by .01
-				print("Gross Revenue: " + "$"+str(amount*.01))
 				print("Square Fee: " + "$"+str(fee*.01))
 				print("--------------------------")
 				print("Square Net Revenue: "+ str(net*.01))
