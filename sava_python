@@ -9,18 +9,36 @@ content = r.content
 
 my_json = content.decode('utf8')
 
-locationID = json.loads(my_json)
+resp = json.loads(my_json)
 
 
 #print(locationID["payments"][0]["id"])
 
 
-for x in locationID["payments"]: 
-	ID = x["id"]
-	created = x["created_at"]
-	amount = x["amount_money"]["amount"]
-
-	print(ID)
-	print(created)
-	#square uses 100 for $1, 103 for $1.03, so multiple it by .01
-	print(amount*.01)
+for x in resp["payments"]: 
+	try: 
+		for y in x["processing_fee"]:
+			ID = x["id"]
+			created = x["created_at"]
+			amount = x["amount_money"]["amount"]
+			locID = x["location_id"]
+			orderID = x["order_id"]
+			fee = y["amount_money"]["amount"]
+			status = x["status"]
+			net = amount - fee 
+	
+	except KeyError:
+			print("There was a failed payment found. You can ignore this")
+			
+	else: 
+			print("Payment Status: " + status)
+			print("Purchase Order: " +ID)
+			print("Location ID: " +locID)
+			print("Order ID: " +orderID)
+			print("Payment Date: " +created)
+			#square uses 100 for $1, 103 for $1.03, so multiple it by .01
+			print("Gross Revenue: " + "$"+str(amount*.01))
+			print("Square Fee: " + "$"+str(fee*.01))
+			print("--------------------------")
+			print("Square Net Revenue: "+ str(net*.01))
+			print("")
