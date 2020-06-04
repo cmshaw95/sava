@@ -1,0 +1,19 @@
+import requests
+import json 
+
+url = 'https://connect.squareup.com/v2/payments'
+header = {'Square-Version': '2020-05-28', 'Authorization': 'Bearer EAAAETiZWYursLwLLN-X1Y7PsDCMaG_dWmK1Ivk_B8enyhuv_XA3gKJUQZQL_l7h', 'Content-Type': 'application/json'}
+r = requests.get(url, headers=header)
+content = r.content
+
+
+my_json = content.decode('utf8')
+
+locationID = json.loads(my_json)
+
+
+#print(locationID["payments"][0]["id"])
+
+
+for x in locationID["payments"]: 
+	print(x["id"])
