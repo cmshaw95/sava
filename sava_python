@@ -16,4 +16,11 @@ locationID = json.loads(my_json)
 
 
 for x in locationID["payments"]: 
-	print(x["id"])
+	ID = x["id"]
+	created = x["created_at"]
+	amount = x["amount_money"]["amount"]
+
+	print(ID)
+	print(created)
+	#square uses 100 for $1, 103 for $1.03, so multiple it by .01
+	print(amount*.01)
