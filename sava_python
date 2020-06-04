@@ -1,44 +1,62 @@
 import requests
 import json 
+from datetime import date
 
+today = date.today()
+
+#high level payment info 
 url = 'https://connect.squareup.com/v2/payments'
-header = {'Square-Version': '2020-05-28', 'Authorization': 'Bearer EAAAETiZWYursLwLLN-X1Y7PsDCMaG_dWmK1Ivk_B8enyhuv_XA3gKJUQZQL_l7h', 'Content-Type': 'application/json'}
+apiKey = "EAAAETiZWYursLwLLN-X1Y7PsDCMaG_dWmK1Ivk_B8enyhuv_XA3gKJUQZQL_l7h"
+header = {'Square-Version': '2020-05-28', 'Authorization': 'Bearer '+str(apiKey), 'Content-Type': 'application/json'}
+
 r = requests.get(url, headers=header)
 content = r.content
 
-
+#parse json data
 my_json = content.decode('utf8')
-
 resp = json.loads(my_json)
 
+def square_shit():
+	print('\n')
+	print("Grabbing your orders from square in the last 7 days.....")
+	print('\n')
+	for x in resp["payments"]: 
+		ID = x["id"]
+		created = x["created_at"]
+		amount = x["amount_money"]["amount"]
+		cur = x["amount_money"]["currency"]
+		locID = x["location_id"]
+		orderID = x["order_id"]
+		status = x["status"]
+		print("Payment Status: " + status)
+		print("Order ID: " +orderID)
+		print("Payment Date: " +created)
+		print("Currency: "+cur)
+		#totalRev+=amount
+		#totalNet+=net
+		try: 
+			for y in x["processing_fee"]:				
+				fee = y["amount_money"]["amount"]
+				net = amount - fee 
+				#totalFees+=fee
+				
+				#square uses 100 for $1, 103 for $1.03, so multiple it by .01
+				print("Gross Revenue: " + "$"+str(amount*.01))
+				print("Square Fee: " + "$"+str(fee*.01))
+				print("--------------------------")
+				print("Square Net Revenue: "+ str(net*.01))
+				print('\n')
 
-#print(locationID["payments"][0]["id"])
+		except KeyError:
+				print("*This is a Failed Payment*")
+				
+				
+
+	#print("Total Gross Revenue: " +str(totalRev*.01))
+	#print("Total Fees: " + str(totalFees*.01))
+	#print("Total Net: " + str(totalNet*.01))
+
+square_shit()
 
 
-for x in resp["payments"]: 
-	try: 
-		for y in x["processing_fee"]:
-			ID = x["id"]
-			created = x["created_at"]
-			amount = x["amount_money"]["amount"]
-			locID = x["location_id"]
-			orderID = x["order_id"]
-			fee = y["amount_money"]["amount"]
-			status = x["status"]
-			net = amount - fee 
-	
-	except KeyError:
-			print("There was a failed payment found. You can ignore this")
-			
-	else: 
-			print("Payment Status: " + status)
-			print("Purchase Order: " +ID)
-			print("Location ID: " +locID)
-			print("Order ID: " +orderID)
-			print("Payment Date: " +created)
-			#square uses 100 for $1, 103 for $1.03, so multiple it by .01
-			print("Gross Revenue: " + "$"+str(amount*.01))
-			print("Square Fee: " + "$"+str(fee*.01))
-			print("--------------------------")
-			print("Square Net Revenue: "+ str(net*.01))
-			print("")
+#def QBO_BOI(): 
