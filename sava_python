@@ -1,70 +1,82 @@
 import requests
-import json 
+import json
 import datetime
 
 today = datetime.datetime.now()
-#find out what the date was 7 days ago 
-d = datetime.timedelta(days = 7)
+# find out what the date was 7 days ago
+d = datetime.timedelta(days=90)
 dateSub = today - d
-#format date to work in API request
+# format date to work in API request
 weekAgo = dateSub.strftime("%Y-%m-%dT%H:%M:%S")
 
-
-#high level payment info 
+# high level payment info
 url = 'https://connect.squareup.com/v2/payments'
-urlDate = 'https://connect.squareup.com/v2/payments?begin_time='+weekAgo
+urlDate = 'https://connect.squareup.com/v2/payments?begin_time=' + weekAgo
 
-apiKey = "EAAAETiZWYursLwLLN-X1Y7PsDCMaG_dWmK1Ivk_B8enyhuv_XA3gKJUQZQL_l7h"
-header = {'Square-Version': '2020-05-28', 'Authorization': 'Bearer '+str(apiKey), 'Content-Type': 'application/json'}
+SquareKey = "EAAAETiZWYursLwLLN-X1Y7PsDCMaG_dWmK1Ivk_B8enyhuv_XA3gKJUQZQL_l7h"
+header = {'Square-Version': '2020-05-28', 'Authorization': 'Bearer ' + str(SquareKey), 'Content-Type': 'application/json'}
 
 r = requests.get(urlDate, headers=header)
 content = r.content
 
-#parse json data
+# parse json data
 my_json = content.decode('utf8')
 resp = json.loads(my_json)
 
+
 def square_shit():
-	print('\n')
-	print("Grabbing your orders from square in the last 7 days.....") 
-	print('\n')
-	for x in resp["payments"]: 
-		ID = x["id"]
-		created = x["created_at"]
-		amount = x["amount_money"]["amount"]
-		cur = x["amount_money"]["currency"]
-		locID = x["location_id"]
-		orderID = x["order_id"]
-		status = x["status"]
-		print("Payment Status: " + status)
-		print("Order ID: " +orderID)
-		print("Payment Date: " +created)
-		print("Currency: "+cur)
-		#square uses 100 for $1, 103 for $1.03, so multiple it by .01
-		print("Payment Revenue: " + "$"+str(amount*.01))
-		#totalRev+=amount
-		#totalNet+=net
-		try: 
-			for y in x["processing_fee"]:				
-				fee = y["amount_money"]["amount"]
-				net = amount - fee 
-				#totalFees+=fee
-				
-				print("Square Fee: " + "$"+str(fee*.01))
-				print("--------------------------")
-				print("Square Net Revenue: "+ str(net*.01))
-				print('\n')
+    print('\n')
+    print("Grabbing your orders from square in the last 7 days.....")
+    print('\n')
+    totRev = 0
+    totFee = 0
 
-		except KeyError:
-				print("*This is a Failed Payment*")
-				
-				
+    for x in resp["payments"]:
+        ID = x["id"]
+        created = x["created_at"]
+        amount = x["amount_money"]["amount"]
+        totRev += amount
+        cur = x["amount_money"]["currency"]
+        locID = x["location_id"]
+        orderID = x["order_id"]
+        status = x["status"]
+        print("Payment Status: " + status)
+        print("Order ID: " + orderID)
+        print("Payment Date: " + created)
+        print("Currency: " + cur)
+        # square uses 100 for $1, 103 for $1.03, so multiple it by .01
+        print("Payment Revenue: " + "$" + str(amount * .01))
+        # totalRev+=amount
+        # totalNet+=net
+        if status != "FAILED":
+            try:
+                for y in x["processing_fee"]:
+                    fee = y["amount_money"]["amount"]
+                    totFee += fee
+                    net = amount - fee
+                    # totalFees+=fee
 
-	#print("Total Gross Revenue: " +str(totalRev*.01))
-	#print("Total Fees: " + str(totalFees*.01))
-	#print("Total Net: " + str(totalNet*.01))
+                    print("Square Fee: " + "$" + str(fee * .01))
+                    print("--------------------------")
+                    print("Square Net Revenue: " + str(net * .01))
+                    print('\n')
+
+            except KeyError:
+                print("*This is a Failed Payment*")
+        else:
+            print("*This is a Failed Payment*")
+            totRev -= amount
+
+    netTot = totRev - totFee
+    print('\n')
+    print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+    print("Total Revenue from last 7 days: " + str(totRev*.01))
+    print("Total Fee's from last 7 days: " + str(totFee*.01))
+    print("--------------------------")
+    print('Net Total: ' + str(netTot*.01))
+    print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+
 
 square_shit()
 
-
-#def QBO_BOI(): 
+# def QBO_BOI(): 
