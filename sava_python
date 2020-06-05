@@ -2,6 +2,7 @@ import requests
 import json
 import datetime
 
+##############Square variables#############
 today = datetime.datetime.now()
 # find out what the date was 7 days ago
 d = datetime.timedelta(days=90)
@@ -22,6 +23,11 @@ content = r.content
 # parse json data
 my_json = content.decode('utf8')
 resp = json.loads(my_json)
+#################Square variables#############
+
+
+############## QBO Info #####################
+QbURL = 'https://sandbox-quickbooks.api.intuit.com'
 
 
 def square_shit():
@@ -72,11 +78,13 @@ def square_shit():
     print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
     print("Total Revenue from last 7 days: " + str(totRev*.01))
     print("Total Fee's from last 7 days: " + str(totFee*.01))
-    print("--------------------------")
+    print("-----------------------------------")
     print('Net Total: ' + str(netTot*.01))
     print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
 
 
 square_shit()
 
-# def QBO_BOI(): 
+
+
+#def QBO_BOI():
