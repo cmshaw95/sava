@@ -27,8 +27,31 @@ resp = json.loads(my_json)
 
 
 ############## QBO Info #####################
-QbURL = 'https://sandbox-quickbooks.api.intuit.com'
+prodQBO = 'https://quickbooks.api.intuit.com'
+sandQBO = 'https://sandbox-quickbooks.api.intuit.com'
+QBid = '4620816365059481960'
+key2 = 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..kaRDzoQoUuFRDqgIN3bZmQ.k_MKC9drQZbkoNDGRNk9acGxHAt-DyF_1nACHRiEH2paqx8tq-ZP-td6xIo0-T8LkcsiSvaPfZPdlHwu3YT2jtGvQdVz6XTtMFViPrEQhFn_Gu16fY-ocjGZJ98E2rP42aC2SvvPz1C9yEaSJWgPgsGZbY4bSf-3fGzJV9gZEKK6pgvYknES0GBEVC-EWY1PJRnY0p1Mx_9TCCyZSlboVvAoJlteYayfTAGHSfbgbWWGDZXXxEx7Dz-AmAJqWkP0voWWnA6BlcVx75vkgAN9MR8kGuGTkLDi94MaVrSPQj8-OWhKMjpikTuFbtjTaDqiQJ5FjmAGpHxPYTwbNvpA6tI8xihoJk-jdKnP8Px4Tm3VrDp2Zd4jYhILnqlk8ZoJS7WjxsjnLo79vZogzv5vxBLlCwnmZQAzuZNpXwC_vZ1I5t2gV7BUUuiyk1YV6RvfLISOOjLbIL1goehUi-G_6tcWyV5xrRVUBIjKJnzTqZ8uojCzrnrSF0cq5sQ6tRuWoEvils0jhpQN7cZO_22JvvAux0xWaIc_9tFnIM5Jf0MwO9IYpgQTf-X4BStCnHM5xywO3fRUGqOHFgMICnv7lveD0F4XqLyQ54HyFtRnWpUKlJsSQp9Rn61_N-sK0-F3naxnWNgDJfEEB9nk81VxwLJV6GvP_URnkQ-99VHpS7rt83VVZ1n2qnHN77kt268-BuoGF0DDWH7zf6-6G5vfjAt4bC-Bc8BU2amz9V6DeP8.4z1AnSx8HL95uIyd5inP7Q'
+qbHead = {'Accept': 'application/json', 'Authorization': 'Bearer ' + str(key2)}
 
+
+QBpayment = sandQBO+'/v3/company/'+QBid+'/query?query=select * from PaymentMethod&minorversion=51'
+QBacct = sandQBO+"/v3/company/4620816365059481960/query?query=select * from Account where Metadata.CreateTime > '2018-12-31'&minorversion=51"
+
+getPay = requests.get(QBpayment, headers=qbHead)
+getAcct = requests.get(QBacct, headers=qbHead)
+
+payCont = getPay.content
+acctCont = getAcct.content
+
+#json conversions 
+pay_json = payCont.decode('utf8')
+payResp = json.loads(pay_json)
+#json conversions 
+acctReq_json = acctCont.decode('utf8')
+acctResp = json.loads(acctReq_json)
+
+
+############## QBO Info #####################
 
 def square_shit():
     print('\n')
@@ -46,6 +69,7 @@ def square_shit():
         locID = x["location_id"]
         orderID = x["order_id"]
         status = x["status"]
+        print('+++++++++++++++++++++++++++++++++++++++++++++++')
         print("Payment Status: " + status)
         print("Order ID: " + orderID)
         print("Payment Date: " + created)
@@ -65,6 +89,7 @@ def square_shit():
                     print("Square Fee: " + "$" + str(fee * .01))
                     print("--------------------------")
                     print("Square Net Revenue: " + str(net * .01))
+                    print('+++++++++++++++++++++++++++++++++++++++++++++++')
                     print('\n')
 
             except KeyError:
@@ -78,7 +103,7 @@ def square_shit():
     print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
     print("Total Revenue from last 7 days: " + str(totRev*.01))
     print("Total Fee's from last 7 days: " + str(totFee*.01))
-    print("-----------------------------------")
+    print("--------------------------------------")
     print('Net Total: ' + str(netTot*.01))
     print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
 
@@ -87,4 +112,29 @@ square_shit()
 
 
 
-#def QBO_BOI():
+def QBO_BOI():
+	print('\n')
+	fonso = input("Would you like to continue to adding this info to QBO? (Enter 'y' to continue) ")
+	print(fonso)
+
+	if fonso == 'y': 
+		for x in payResp['QueryResponse']['PaymentMethod']: 
+			payName = x['Name']
+			payID = x['Id']
+			#if 'QBO' in payName: 
+				#print(payName) 
+
+		for x in acctResp['QueryResponse']['Account']:
+			acctName = x['Name']
+			acctID = x['Id']
+			if 'Atlantic' in acctName:
+				urName = acctName
+				urID = acctID
+				print('We\'ll deposit to: ' +urName +'\nAcct ID is: ' +urID)
+			
+	else:
+		print("END HERE")
+
+
+QBO_BOI()
+		 
