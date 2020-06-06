@@ -25,12 +25,11 @@ my_json = content.decode('utf8')
 resp = json.loads(my_json)
 #################Square variables#############
 
-
 ############## QBO Info #####################
 prodQBO = 'https://quickbooks.api.intuit.com'
 sandQBO = 'https://sandbox-quickbooks.api.intuit.com'
 QBid = '4620816365059481960'
-key2 = 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..kaRDzoQoUuFRDqgIN3bZmQ.k_MKC9drQZbkoNDGRNk9acGxHAt-DyF_1nACHRiEH2paqx8tq-ZP-td6xIo0-T8LkcsiSvaPfZPdlHwu3YT2jtGvQdVz6XTtMFViPrEQhFn_Gu16fY-ocjGZJ98E2rP42aC2SvvPz1C9yEaSJWgPgsGZbY4bSf-3fGzJV9gZEKK6pgvYknES0GBEVC-EWY1PJRnY0p1Mx_9TCCyZSlboVvAoJlteYayfTAGHSfbgbWWGDZXXxEx7Dz-AmAJqWkP0voWWnA6BlcVx75vkgAN9MR8kGuGTkLDi94MaVrSPQj8-OWhKMjpikTuFbtjTaDqiQJ5FjmAGpHxPYTwbNvpA6tI8xihoJk-jdKnP8Px4Tm3VrDp2Zd4jYhILnqlk8ZoJS7WjxsjnLo79vZogzv5vxBLlCwnmZQAzuZNpXwC_vZ1I5t2gV7BUUuiyk1YV6RvfLISOOjLbIL1goehUi-G_6tcWyV5xrRVUBIjKJnzTqZ8uojCzrnrSF0cq5sQ6tRuWoEvils0jhpQN7cZO_22JvvAux0xWaIc_9tFnIM5Jf0MwO9IYpgQTf-X4BStCnHM5xywO3fRUGqOHFgMICnv7lveD0F4XqLyQ54HyFtRnWpUKlJsSQp9Rn61_N-sK0-F3naxnWNgDJfEEB9nk81VxwLJV6GvP_URnkQ-99VHpS7rt83VVZ1n2qnHN77kt268-BuoGF0DDWH7zf6-6G5vfjAt4bC-Bc8BU2amz9V6DeP8.4z1AnSx8HL95uIyd5inP7Q'
+key2 = 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..XhvfWYHa2O8T2zkDFZjleA.4YxSFOFbEVqR3_Zc0j4xzOJDxvOHmTejXmzYvg7qVzzYKkGTkYibK6u2QTKAiYthTrXLNrlPB33bRSFhxubmoF1U09wAI6NDomdmpHlDr3co2-2VV2xU3MMtfl7gNVui3odY0XzOra23UKd44a4vqF-UXHCPuXC6fPz5X0Nr4FeIev47ZLt2nIRp9Joamqo2E79adHxZrzCIW_F6SdtKecVed3XwijI2yiqpn-Vdu8RcLOnsRvnmeAyIe3lOsd7auhWtT1_dc1Ekn4SBVS6d6pvbO4EEKDDt5mE4JheY30C1eknw9f-x_VkspJDplXr2oL46xaFKR8WOwxWw2s2cJYokVj57aAqJWz3unO3_1hE6apEItb5_D1G8tYJr100JeTUnH1NfBVaVluGjQAMJ5G2lklTaSZIgt0oVFcyGScam8jCM33yB3ZQjZLFv_Sk_9SMdrq78PEezfzYE5oJH5MXNcfcNbMtWaVlSpeestnOaH5ljtfMVfXZblcfeC_gz-MNOnV0udYIpT7dKjNDPuNin5ptKf1SP9Vtl50faFzvVy9FduAwUqn41KxRYYm9hQ7hxnkIOyiRYS2L0o-SlMUKaShCoFh_cvdvASfX9DgOMZ-DMzj-4VrsKeKQoI81yNHaB3U5H36gIP8Pd9w6gGmTzPbLRIGN9OB67VxYRf3b66JzUw7MH6IhkzoQH0-PxMUhdmNUcXEzIDm2ucSZ_3RVaYBTrYBL3Uv7FsRs295s.W76PvE-7jVM1FW5jI_k3xQ'
 qbHead = {'Accept': 'application/json', 'Authorization': 'Bearer ' + str(key2)}
 
 #QB URLs 
@@ -43,7 +42,7 @@ QBsalesreceipt = sandQBO+'/v3/company/'+QBid+'/salesreceipt?minorversion=51'
 getPay = requests.get(QBpayment, headers=qbHead)
 getAcct = requests.get(QBacct, headers=qbHead)
 getCust = requests.get(QBcustomer, headers=qbHead)
-#postSalesR = requests.post(QBsalesreceipt, json=QBO_BOI(sales_json))
+
 
 #gather content
 payCont = getPay.content
@@ -69,7 +68,6 @@ def square_shit():
     print('\n')
     totRev = 0
     totFee = 0
-
     for x in resp["payments"]:
         ID = x["id"]
         created = x["created_at"]
@@ -108,7 +106,12 @@ def square_shit():
             print("*This is a Failed Payment*")
             totRev -= amount
 
-    netTot = totRev - totFee
+    global netTot 
+    netTot = (totRev - totFee)*.01
+    global useRev 
+    useRev = totRev*.01
+    global useFee
+    useFee = totFee*.01
     print('\n')
     print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
     print("Total Revenue from last 7 days: " + str(totRev*.01))
@@ -124,9 +127,9 @@ square_shit()
 
 def QBO_BOI():
 	print('\n')
-	fonso = input("Would you like to continue to adding this info to QBO? (Enter 'y' to continue) ")
+	fonso = input("Would you like to continue to add the above sales info to QBO? (Enter 'y' to continue) ")
 	print(fonso)
-
+	print('HTTP Status code: '+str(getPay))
 	print('\nGathering QBO information.....\n')
 	if fonso == 'y': 
 		#find the payment method
@@ -156,21 +159,21 @@ def QBO_BOI():
 				print('Customer Name: ' + urCustName)
 
 
-
-		fonso2 = input("Would you like to continue to adding this info to QBO? (Enter 'y' to continue) ")
+		fonso2 = input("\nWe\'re about to post this data to a new sales receipt, continue? (Enter 'y' to continue) ")
 		print(fonso2)
 			
-
 		sales_json = { "Line": [
 			  {
 			  "Id": "1",
 			  "LineNum": 1,
 			  "Description": "Test API customer added",
-			  "Amount": 33,
+			  "Amount": useRev,
 			  "DetailType": "SalesItemLineDetail",
 			  "SalesItemLineDetail": {
 			   "ServiceDate": "2020-05-17",
 			   "ItemRef": {
+			   #need to find the right item
+			   "value": "8",
 			   "name": "Square Rev"
 			   },
 			   "TaxCodeRef": {
@@ -192,11 +195,17 @@ def QBO_BOI():
 			 }
 			}
 
+
+		#post data 
+		postSalesR = requests.post(QBsalesreceipt, headers=qbHead, json=sales_json)
+		print("Data upload status code: ", postSalesR)
 		print(sales_json)
-			
+
+
 	else:
 		print("END HERE")
 
 
+
+
 QBO_BOI()
-		 
