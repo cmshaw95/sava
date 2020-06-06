@@ -33,15 +33,22 @@ QBid = '4620816365059481960'
 key2 = 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..kaRDzoQoUuFRDqgIN3bZmQ.k_MKC9drQZbkoNDGRNk9acGxHAt-DyF_1nACHRiEH2paqx8tq-ZP-td6xIo0-T8LkcsiSvaPfZPdlHwu3YT2jtGvQdVz6XTtMFViPrEQhFn_Gu16fY-ocjGZJ98E2rP42aC2SvvPz1C9yEaSJWgPgsGZbY4bSf-3fGzJV9gZEKK6pgvYknES0GBEVC-EWY1PJRnY0p1Mx_9TCCyZSlboVvAoJlteYayfTAGHSfbgbWWGDZXXxEx7Dz-AmAJqWkP0voWWnA6BlcVx75vkgAN9MR8kGuGTkLDi94MaVrSPQj8-OWhKMjpikTuFbtjTaDqiQJ5FjmAGpHxPYTwbNvpA6tI8xihoJk-jdKnP8Px4Tm3VrDp2Zd4jYhILnqlk8ZoJS7WjxsjnLo79vZogzv5vxBLlCwnmZQAzuZNpXwC_vZ1I5t2gV7BUUuiyk1YV6RvfLISOOjLbIL1goehUi-G_6tcWyV5xrRVUBIjKJnzTqZ8uojCzrnrSF0cq5sQ6tRuWoEvils0jhpQN7cZO_22JvvAux0xWaIc_9tFnIM5Jf0MwO9IYpgQTf-X4BStCnHM5xywO3fRUGqOHFgMICnv7lveD0F4XqLyQ54HyFtRnWpUKlJsSQp9Rn61_N-sK0-F3naxnWNgDJfEEB9nk81VxwLJV6GvP_URnkQ-99VHpS7rt83VVZ1n2qnHN77kt268-BuoGF0DDWH7zf6-6G5vfjAt4bC-Bc8BU2amz9V6DeP8.4z1AnSx8HL95uIyd5inP7Q'
 qbHead = {'Accept': 'application/json', 'Authorization': 'Bearer ' + str(key2)}
 
-
+#QB URLs 
 QBpayment = sandQBO+'/v3/company/'+QBid+'/query?query=select * from PaymentMethod&minorversion=51'
-QBacct = sandQBO+"/v3/company/4620816365059481960/query?query=select * from Account where Metadata.CreateTime > '2018-12-31'&minorversion=51"
+QBacct = sandQBO+"/v3/company/"+QBid+"/query?query=select * from Account where Metadata.CreateTime > '2018-12-31'&minorversion=51"
+QBcustomer = sandQBO+"/v3/company/"+QBid+"/query?query=select * from Customer Where Metadata.LastUpdatedTime > '2015-03-01'&minorversion=51"
+QBsalesreceipt = sandQBO+'/v3/company/'+QBid+'/salesreceipt?minorversion=51' 
 
+#make requests
 getPay = requests.get(QBpayment, headers=qbHead)
 getAcct = requests.get(QBacct, headers=qbHead)
+getCust = requests.get(QBcustomer, headers=qbHead)
+#postSalesR = requests.post(QBsalesreceipt, json=QBO_BOI(sales_json))
 
+#gather content
 payCont = getPay.content
 acctCont = getAcct.content
+custCont = getCust.content
 
 #json conversions 
 pay_json = payCont.decode('utf8')
@@ -49,6 +56,9 @@ payResp = json.loads(pay_json)
 #json conversions 
 acctReq_json = acctCont.decode('utf8')
 acctResp = json.loads(acctReq_json)
+#json conversions
+custReq_json = custCont.decode('utf8')
+custResp = json.loads(custReq_json)
 
 
 ############## QBO Info #####################
@@ -117,20 +127,72 @@ def QBO_BOI():
 	fonso = input("Would you like to continue to adding this info to QBO? (Enter 'y' to continue) ")
 	print(fonso)
 
+	print('\nGathering QBO information.....\n')
 	if fonso == 'y': 
+		#find the payment method
 		for x in payResp['QueryResponse']['PaymentMethod']: 
 			payName = x['Name']
 			payID = x['Id']
-			#if 'QBO' in payName: 
-				#print(payName) 
+			if 'ACH' in payName: 
+				urPayName = payName
+				urPayID = payID
+				print('Payment method is: '+payName) 
 
+		#find the deposit id 
 		for x in acctResp['QueryResponse']['Account']:
 			acctName = x['Name']
 			acctID = x['Id']
 			if 'Atlantic' in acctName:
 				urName = acctName
 				urID = acctID
-				print('We\'ll deposit to: ' +urName +'\nAcct ID is: ' +urID)
+				print('We\'ll deposit to: ' +urName)
+
+		for x in custResp['QueryResponse']['Customer']:
+			custName = x['DisplayName']
+			custID = x['Id']
+			if 'Square Online' in custName: 
+				urCustName = custName
+				urCustID = custID
+				print('Customer Name: ' + urCustName)
+
+
+
+		fonso2 = input("Would you like to continue to adding this info to QBO? (Enter 'y' to continue) ")
+		print(fonso2)
+			
+
+		sales_json = { "Line": [
+			  {
+			  "Id": "1",
+			  "LineNum": 1,
+			  "Description": "Test API customer added",
+			  "Amount": 33,
+			  "DetailType": "SalesItemLineDetail",
+			  "SalesItemLineDetail": {
+			   "ServiceDate": "2020-05-17",
+			   "ItemRef": {
+			   "name": "Square Rev"
+			   },
+			   "TaxCodeRef": {
+			   "value": "TAX"
+			   },
+			   "TaxClassificationRef": {
+			   "value": "EUC-99990202-V1-00020000"
+			   }
+			  }
+			  }
+			 ],
+			 "CustomerRef": {
+			  "value": urCustID,
+			  "name": urCustName
+			 },
+			 "PaymentMethodRef": {
+			  "value": urPayID,
+			  "name": urPayName
+			 }
+			}
+
+		print(sales_json)
 			
 	else:
 		print("END HERE")
