@@ -7,7 +7,7 @@ today = datetime.datetime.now()
 now = today.strftime("%Y-%m-%d")
 
 # find out what the date was 7 days ago
-d = datetime.timedelta(days=90)
+d = datetime.timedelta(days=7)
 dateSub = today - d
 # format date to work in API request
 weekAgo = dateSub.strftime("%Y-%m-%dT%H:%M:%S")
