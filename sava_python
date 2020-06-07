@@ -131,9 +131,10 @@ def square_shit():
 def QBO_BOI():
 	fonso = input("\nWould you like to continue to gathering the QBO data? (Enter 'y' to continue) ")
 	print(fonso)
-	print('\nHTTP Status code: ',getPay)
-	print('\nGathering QBO information.....\n')
+
 	if fonso == 'y': 
+		print('\nHTTP Status code: ',getPay)
+		print('\nGathering QBO information.....\n')
 		#find the payment method
 		for x in payResp['QueryResponse']['PaymentMethod']: 
 			payName = x['Name']
@@ -250,7 +251,7 @@ def QBO_BOI():
 			print('\nProgram stopped before uploading data to QBO.')
 
 	else:
-		print("You stopped program before we could grab QBO info.")
+		print("\nYou stopped program before we could grab QBO info.")
 
 
 
