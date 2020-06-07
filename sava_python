@@ -4,6 +4,8 @@ import datetime
 
 ##############Square variables#############
 today = datetime.datetime.now()
+now = today.strftime("%Y-%m-%d")
+
 # find out what the date was 7 days ago
 d = datetime.timedelta(days=90)
 dateSub = today - d
@@ -29,7 +31,7 @@ resp = json.loads(my_json)
 prodQBO = 'https://quickbooks.api.intuit.com'
 sandQBO = 'https://sandbox-quickbooks.api.intuit.com'
 QBid = '4620816365059481960'
-key2 = 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..XhvfWYHa2O8T2zkDFZjleA.4YxSFOFbEVqR3_Zc0j4xzOJDxvOHmTejXmzYvg7qVzzYKkGTkYibK6u2QTKAiYthTrXLNrlPB33bRSFhxubmoF1U09wAI6NDomdmpHlDr3co2-2VV2xU3MMtfl7gNVui3odY0XzOra23UKd44a4vqF-UXHCPuXC6fPz5X0Nr4FeIev47ZLt2nIRp9Joamqo2E79adHxZrzCIW_F6SdtKecVed3XwijI2yiqpn-Vdu8RcLOnsRvnmeAyIe3lOsd7auhWtT1_dc1Ekn4SBVS6d6pvbO4EEKDDt5mE4JheY30C1eknw9f-x_VkspJDplXr2oL46xaFKR8WOwxWw2s2cJYokVj57aAqJWz3unO3_1hE6apEItb5_D1G8tYJr100JeTUnH1NfBVaVluGjQAMJ5G2lklTaSZIgt0oVFcyGScam8jCM33yB3ZQjZLFv_Sk_9SMdrq78PEezfzYE5oJH5MXNcfcNbMtWaVlSpeestnOaH5ljtfMVfXZblcfeC_gz-MNOnV0udYIpT7dKjNDPuNin5ptKf1SP9Vtl50faFzvVy9FduAwUqn41KxRYYm9hQ7hxnkIOyiRYS2L0o-SlMUKaShCoFh_cvdvASfX9DgOMZ-DMzj-4VrsKeKQoI81yNHaB3U5H36gIP8Pd9w6gGmTzPbLRIGN9OB67VxYRf3b66JzUw7MH6IhkzoQH0-PxMUhdmNUcXEzIDm2ucSZ_3RVaYBTrYBL3Uv7FsRs295s.W76PvE-7jVM1FW5jI_k3xQ'
+key2 = 'eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiYWxnIjoiZGlyIn0..Wf97aLQtLXXLoO6bmFsJLw.8JXqkf1QgnWLGtzESk0A2s1XVEW2vV_EVTfInNlkGzH20-hg3c7tOW9rFdrNPL6N5VdHy8tQhKwFvi5HzvIOqgvnNQUzsZz5sO6EdFs05Qn74TGs9FkQwpUKX1X44VR2qegGG3uuLtWzhyn-__wQrLrG07C64hWvELXidVnQ-YlcgKd8BO2qGbTeZsaR_gLijquPfyAiZ4dSknClS6sDkPXi-BlQIExj6uUtubKAj_PkKd65mYvH5fAhFSgl8dYypvpjVoVFaquwTCeboGnPoxIa0jiadMqnywVtCKnZnc1qs9LXPqYZeZoP949y2I3Ynw7PawBbcec5T5m59n9wpsccWByLq2m5NvC8IhLXfIsOVRaEvrkPua6NiRgCFzn85IhwPOq2oWaHNJyOavJhqGXmTiM-6MaEZFhcDs60V0uJkX7piAv4sCc5va51JNs6SGVZ-ZZaP8PNoE_le5UO4NlU72OwV0Ty3KzevpBoH9Bt-YRT5m_7om2DmR9DFDkePpWuBvIyRZ---svNXYtpJ5gbE8UXmOmm3NWkXNC3ed_-KKpSDPaZFIsAGqYLIOukxpU4Vkvo4S5Uf-We4T7vGK_4rRkwughPFRJKVoMvFcfBwBAA_Dp9Ypk1As7kWCxrcL_uDYuGc9s3nqHKTM7B_gOYXQDIgTkHloVKcO2Ixq4GC9D1uXyc5CSH4VzS-G24cTTBs-yo47WvKTayDNJmqZYWMiuWj2iu2vpLAu7QK2U-hSY5zSLAGZByX_UyEsFu.h1XHyPpDgLbOIUx9SRaypA'
 qbHead = {'Accept': 'application/json', 'Authorization': 'Bearer ' + str(key2)}
 
 #QB URLs 
@@ -37,17 +39,19 @@ QBpayment = sandQBO+'/v3/company/'+QBid+'/query?query=select * from PaymentMetho
 QBacct = sandQBO+"/v3/company/"+QBid+"/query?query=select * from Account where Metadata.CreateTime > '2018-12-31'&minorversion=51"
 QBcustomer = sandQBO+"/v3/company/"+QBid+"/query?query=select * from Customer Where Metadata.LastUpdatedTime > '2015-03-01'&minorversion=51"
 QBsalesreceipt = sandQBO+'/v3/company/'+QBid+'/salesreceipt?minorversion=51' 
+QBitems = sandQBO+'/v3/company/'+QBid+'/query?query=select * from Item maxresults 30&minorversion=51'
 
 #make requests
 getPay = requests.get(QBpayment, headers=qbHead)
 getAcct = requests.get(QBacct, headers=qbHead)
 getCust = requests.get(QBcustomer, headers=qbHead)
-
+getItem = requests.get(QBitems, headers=qbHead)
 
 #gather content
 payCont = getPay.content
 acctCont = getAcct.content
 custCont = getCust.content
+itemCont = getItem.content
 
 #json conversions 
 pay_json = payCont.decode('utf8')
@@ -58,7 +62,9 @@ acctResp = json.loads(acctReq_json)
 #json conversions
 custReq_json = custCont.decode('utf8')
 custResp = json.loads(custReq_json)
-
+#json conversions
+itemReq_json = itemCont.decode('utf8')
+itemResp = json.loads(itemReq_json)
 
 ############## QBO Info #####################
 
@@ -117,19 +123,15 @@ def square_shit():
     print("Total Revenue from last 7 days: " + str(totRev*.01))
     print("Total Fee's from last 7 days: " + str(totFee*.01))
     print("--------------------------------------")
-    print('Net Total: ' + str(netTot*.01))
+    print('Net Total: ' + str(netTot))
     print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-
-
-square_shit()
 
 
 
 def QBO_BOI():
-	print('\n')
-	fonso = input("Would you like to continue to add the above sales info to QBO? (Enter 'y' to continue) ")
+	fonso = input("\nWould you like to continue to gathering the QBO data? (Enter 'y' to continue) ")
 	print(fonso)
-	print('HTTP Status code: '+str(getPay))
+	print('\nHTTP Status code: ',getPay)
 	print('\nGathering QBO information.....\n')
 	if fonso == 'y': 
 		#find the payment method
@@ -146,9 +148,9 @@ def QBO_BOI():
 			acctName = x['Name']
 			acctID = x['Id']
 			if 'Atlantic' in acctName:
-				urName = acctName
-				urID = acctID
-				print('We\'ll deposit to: ' +urName)
+				urAcctName = acctName
+				urAcctID = acctID
+				print('We\'ll deposit to: ' +urAcctName)
 
 		for x in custResp['QueryResponse']['Customer']:
 			custName = x['DisplayName']
@@ -158,54 +160,101 @@ def QBO_BOI():
 				urCustID = custID
 				print('Customer Name: ' + urCustName)
 
+		for x in itemResp['QueryResponse']['Item']:
+			itemName = x['Name'].lower()
+			itemID = x['Id']
+			if ('Square Sales').lower() and ('product').lower() in itemName: 
+				urItemRevID = itemID
+				urItemRevName = itemName
+				print('Product/Service Revenue Name: ',urItemRevName) 
+			if ('Square fee').lower() in itemName: 
+				urItemFeeID = itemID
+				urItemFeeName = itemName
+				print('Product/Service Fee Name: ',urItemFeeName)
+
 
 		fonso2 = input("\nWe\'re about to post this data to a new sales receipt, continue? (Enter 'y' to continue) ")
 		print(fonso2)
+
+		if fonso2 == 'y': 
 			
-		sales_json = { "Line": [
-			  {
-			  "Id": "1",
-			  "LineNum": 1,
-			  "Description": "Test API customer added",
-			  "Amount": useRev,
-			  "DetailType": "SalesItemLineDetail",
-			  "SalesItemLineDetail": {
-			   "ServiceDate": "2020-05-17",
-			   "ItemRef": {
-			   #need to find the right item
-			   "value": "8",
-			   "name": "Square Rev"
-			   },
-			   "TaxCodeRef": {
-			   "value": "TAX"
-			   },
-			   "TaxClassificationRef": {
-			   "value": "EUC-99990202-V1-00020000"
-			   }
-			  }
-			  }
-			 ],
-			 "CustomerRef": {
-			  "value": urCustID,
-			  "name": urCustName
-			 },
-			 "PaymentMethodRef": {
-			  "value": urPayID,
-			  "name": urPayName
-			 }
-			}
+			sales_json = {
+				 "Line": [
+				  {
+				  "Id": "1",
+				  "LineNum": 1,
+				  "Description": "Square Revenue",
+				  "Amount": useRev,
+				  "DetailType": "SalesItemLineDetail",
+				  "SalesItemLineDetail": {
+				   "ServiceDate": now,
+				   "ItemRef": {
+				   "value": urItemRevID,
+				   "name": urItemRevName
+				   },
+				   "UnitPrice": useRev,
+				   "Qty": 1,
+				   "ItemAccountRef": {
+				   "value": urCustID,
+				   "name": urCustName
+				   }
+				  }
+				  },
+				  {
+				  "Id": "2",
+				  "LineNum": 2,
+				  "Description": "Square Fee's",
+				  "Amount": "-"+str(useFee),
+				  "DetailType": "SalesItemLineDetail",
+				  "SalesItemLineDetail": {
+				   "ServiceDate": now,
+				   "ItemRef": {
+				   "value": urItemFeeID,
+				   "name": urItemFeeName
+				   },
+				   "UnitPrice": "-"+str(useFee),
+				   "Qty": 1,
+				   "ItemAccountRef": {
+				   "value": urCustID,
+				   "name": urCustName
+				   }
+				  }
+				  },
+				  {
+				  "Amount": "-"+str(useFee),
+				  "DetailType": "SubTotalLineDetail",
+				  "SubTotalLineDetail": {}
+				  }
+				 ],
+				 "CustomerRef": {
+				  "value": urCustID,
+				  "name": urCustName
+				 },
+				 "PaymentMethodRef": {
+				  "value": urPayID,
+				  "name": urPayName
+				 },
+				  "DepositToAccountRef": {
+				   "value": urAcctID,
+				   "name": urAcctName
+				  }
+				 }
 
 
-		#post data 
-		postSalesR = requests.post(QBsalesreceipt, headers=qbHead, json=sales_json)
-		print("Data upload status code: ", postSalesR)
-		print(sales_json)
+			#post data 
+			postSalesR = requests.post(QBsalesreceipt, headers=qbHead, json=sales_json)
+			print("Data upload status code: ", postSalesR)
+			
 
+		else: 
+			print('\nProgram stopped before uploading data to QBO.')
 
 	else:
-		print("END HERE")
+		print("You stopped program before we could grab QBO info.")
 
 
 
 
+
+square_shit()
 QBO_BOI()
